@@ -1,0 +1,2 @@
+textures.com for textures
+Crazybump for normal maps

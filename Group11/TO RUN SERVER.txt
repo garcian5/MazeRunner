@@ -1,0 +1,5 @@
+python -m http.server or python -m SimpleHTTPServer
+http://localhost:8000/main.html
+
+NOTE:
+Make sure you're not using Chrome as that can mess with the HTTP Server
