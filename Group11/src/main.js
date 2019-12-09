@@ -4,6 +4,7 @@ var stats = new Stats();
 var countdown = 0.0;
 var timeTop = 0.0;
 
+
 window.onload = () => {
     parseSceneFile("./statefiles/mazeScene.json", state, main);
 }
@@ -71,6 +72,13 @@ function main() {
             'Check to see you are using a <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API#WebGL_2_2" class="alert-link">modern browser</a>.');
         return;
     }
+
+	/*const txtCanvas = document.querySelector("#text");
+	var txtGl = txtCanvas.getContext("2d");
+	txtGl.fillStyle = "blue";
+	txtGl.font = "bold 16px Courier New";
+	txtGl.fillText("Score", (txtCanvas.width / 2) - 17, (txtCanvas.height / 2) + 8);*/
+
 
     const vertShaderSample =
         `#version 300 es
@@ -198,6 +206,7 @@ function main() {
         keyboard: {},
         mouse: { sensitivity: 0.4 },
         gameStarted: false,
+		timeBegin: false,
         camera: {
             name: 'camera',
             position: vec3.fromValues(0.5, 0.0, -2.5),
@@ -313,7 +322,6 @@ function startRendering(gl, state) {
             }
 
             if (state.keyboard["w"]) {
-
                 if (!flag){
                     moveForward(state);
                 } 
@@ -343,7 +351,7 @@ function startRendering(gl, state) {
                     vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-1 * deltaTime));
                 }
             }
-            if (state.keyboard['c']){ // change to top view								
+            if (state.keyboard['c']){ // change to top view	
 				flag = true;
 				timeTop += deltaTime;
 				//console.log("time: " + timeTop);
@@ -351,7 +359,7 @@ function startRendering(gl, state) {
 					flag = false;
 					timeTop = 0;
 					state.keyboard['c'] = false;
-				}			
+				}				
 			}
 			if (state.keyboard['v']){ // change to first person view
 				flag = false;
