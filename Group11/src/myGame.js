@@ -5,6 +5,30 @@ var doWander = false;
 var allTokensFound = false;
 var topViewCount = 4; // only 3 tries for top down view
 
+var score = document.getElementsByTagName('h2')[0];
+var seconds = 0, minutes = 0, hours = 0;
+var t;
+
+var timerBegin = false;
+
+function startTime() {
+	seconds++; // add seconds
+	if (seconds >= 60) { // if seconds is 60 or over, change minutes
+		seconds = 0;
+		minutes++;
+		if (minutes >= 60) { // if minutes go over 60 change hours
+			hours++;
+		}
+	}
+	// write in html
+	score.textContent = (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds);
+	timer();
+}
+
+function timer() {
+	t = setTimeout(startTime, 1000);
+}
+
 function startGame(state) {
     document.addEventListener("contextmenu", function (e) {
         e.preventDefault();
@@ -15,7 +39,7 @@ function startGame(state) {
             state.tokens += 1;
         }
     }
-
+	
     gameRunning = true;
 
     updateTokens(state);
@@ -39,12 +63,22 @@ function startGame(state) {
     document.addEventListener('mouseup', (event) => {
         state.mouse['camMove'] = false;
         state.mouse.rateX = 0;
-    })
+    })		
 
     document.addEventListener('keypress', (event) => {
         switch (event.code) {
-            case "KeyW":
-                state.keyboard[event.key] = true;
+            case "Space":
+				startTime();
+				state.timeBegin = true;
+				state.keyboard[event.key] = true;
+				myMusic = new sound("./sounds/bg_music.mp3");
+				myMusic.play();
+
+			case "KeyW":
+				if (!state.timeBegin)
+					state.keyboard[event.key] = false;
+				else
+					state.keyboard[event.key] = true;
                 break;
 
             case "KeyS":
@@ -71,6 +105,7 @@ function startGame(state) {
                 break;
         }
     });
+	
 
     document.addEventListener('keyup', (event) => {
         switch (event.code) {
@@ -91,16 +126,18 @@ function startGame(state) {
                 break;
         
             case "KeyC":
-                topViewCount--;
-                console.log("topViewCount: " + topViewCount);
-                if (topViewCount <= 0) {
-                    state.keyboard[event.key] = false;
-                    topViewCount = 0;	
-                    console.log("Can't open top down view anymore");
-                } else {
-                    state.keyboard[event.key] = true;
-                    state.keyboard['v'] = false;
-                }
+				if(state.timeBegin) {
+					topViewCount--;
+					console.log("topViewCount: " + topViewCount);
+					if (topViewCount <= 0) {
+						state.keyboard[event.key] = false;
+						topViewCount = 0;	
+						console.log("Can't open top down view anymore");
+					} else {
+						state.keyboard[event.key] = true;
+						state.keyboard['v'] = false;
+					}
+				}
                 break;
 
             case "KeyV":
@@ -138,6 +175,23 @@ function startGame(state) {
                 break;
         }
     });
+
+	
+}
+
+function sound(src) {
+	this.sound = document.createElement("audio");
+	this.sound.src = src;
+	this.sound.setAttribute("preload", "auto");
+	this.sound.setAttribute("controls", "none");
+	this.sound.style.display = "none";
+	document.body.appendChild(this.sound);
+	this.play = function(){
+	this.sound.play();
+	}
+	this.stop = function(){
+	this.sound.pause();
+	}
 }
 
 function vectorLength(vector){
@@ -427,5 +481,8 @@ function endGame(state, successful){
     }else{
         document.getElementById("objective").innerHTML = "Game Over! You collected " + state.tokensCollected + "/" + state.tokens + " apples";
     }
-    setTimeout(function(){ location.reload(true); }, 3000);
+	clearTimeout(t);
+	
+	score.textContent = "Your final score is: " + t + "seconds";
+    setTimeout(function(){ location.reload(true); }, 10000);
 }
